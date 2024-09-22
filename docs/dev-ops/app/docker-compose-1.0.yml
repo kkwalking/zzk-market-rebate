@@ -3,8 +3,8 @@ version: '3.8'
 # docker-compose -f docker-compose-1.0.yml up -d
 services:
   zzk-market-rebate-app:
-    image: zzk/zzk-market-rebate:1.0
-    container_name: zzk-market-rebate
+    image: zhouzekun/zzk-market-rebate-app:1.0
+    container_name: zzk-market-rebate-app
     restart: always
     ports:
       - "8091:8091"
@@ -27,3 +27,9 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
+    networks:
+      - my-network
+
+networks:
+  my-network:
+    external: true

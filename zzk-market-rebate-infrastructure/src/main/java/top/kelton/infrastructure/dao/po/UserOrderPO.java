@@ -1,4 +1,4 @@
-package top.kelton.infrastructure.persistent.po;
+package top.kelton.infrastructure.dao.po;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

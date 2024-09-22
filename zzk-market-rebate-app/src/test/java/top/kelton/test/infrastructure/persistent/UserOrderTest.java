@@ -1,7 +1,6 @@
 package top.kelton.test.infrastructure.persistent;
 
-import top.kelton.infrastructure.persistent.dao.IUserOrderDao;
-import top.kelton.infrastructure.persistent.po.UserOrderPO;
+import top.kelton.infrastructure.dao.po.UserOrderPO;
 import com.alibaba.fastjson2.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;

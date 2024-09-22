@@ -12,26 +12,26 @@ thread:
         block-queue-size: 5000
         policy: CallerRunsPolicy
 
-# 数据库配置 - sharding-jdbc 分库分表
+# rabbitmq配置
 spring:
   rabbitmq:
-    addresses: 127.0.0.1
+    host: 127.0.0.1
     port: 5672
-    username: guest
-    password: guest
-    listener:
-      simple:
-        prefetch: 1 # 每次投递n个消息，消费完在投递n个
-    topic:
-      activity_sku_stock_zero: activity_sku_stock_zero
-      send_award: send_award
-      send_rebate: send_rebate
-      credit_adjust_success: credit_adjust_success
+    username: root
+    password: root
+#    listener:
+#      simple:
+#        prefetch: 1 # 每次投递n个消息，消费完在投递n个
+  #    topic:
+#      activity_sku_stock_zero: activity_sku_stock_zero
+#      send_award: send_award
+#      send_rebate: send_rebate
+#      credit_adjust_success: credit_adjust_success
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/zzk-big-market?useUnicode=true&characterEncoding=utf8&useSSL=false
+    url: jdbc:mysql://127.0.0.1:13306/zzk-market-rebate?useUnicode=true&characterEncoding=utf8&useSSL=false
     username: root
-    password: 0754zzk
+    password: 123456
     hikari:
       maximum-pool-size: 10
       minimum-idle: 2
@@ -48,8 +48,8 @@ redis:
   sdk:
     config:
       host: 127.0.0.1
-      port: 6379
-      password: 123456
+      port: 16379
+      password:
       pool-size: 10
       min-idle-size: 5
       idle-timeout: 30000
