@@ -2,7 +2,6 @@ package top.kelton.trigger.rpc;
 
 import top.kelton.api.IUserService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.dubbo.config.annotation.DubboService;
 
 @Slf4j
 //@DubboService(version = "1.0.0", timeout = 450)
