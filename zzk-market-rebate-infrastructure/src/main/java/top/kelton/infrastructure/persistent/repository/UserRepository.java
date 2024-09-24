@@ -1,11 +1,11 @@
-package top.kelton.infrastructure.adapter.repository;
+package top.kelton.infrastructure.persistent.repository;
 
 import com.alibaba.fastjson2.JSON;
 import org.springframework.stereotype.Service;
 import top.kelton.domain.user.model.entity.UserEntity;
 import top.kelton.domain.user.repository.IUserRepository;
-import top.kelton.infrastructure.dao.IUserDao;
-import top.kelton.infrastructure.dao.po.UserPO;
+import top.kelton.infrastructure.persistent.dao.IUserDao;
+import top.kelton.infrastructure.persistent.po.UserPO;
 import top.kelton.infrastructure.event.EventPublisher;
 import top.kelton.infrastructure.redis.IRedisService;
 import top.kelton.types.event.BaseEvent;

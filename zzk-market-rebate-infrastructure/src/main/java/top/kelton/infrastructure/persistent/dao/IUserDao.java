@@ -1,8 +1,7 @@
-package top.kelton.infrastructure.dao;
+package top.kelton.infrastructure.persistent.dao;
 
 import org.apache.ibatis.annotations.Mapper;
-import top.kelton.infrastructure.dao.po.UserOrderPO;
-import top.kelton.infrastructure.dao.po.UserPO;
+import top.kelton.infrastructure.persistent.po.UserPO;
 
 import java.util.List;
 

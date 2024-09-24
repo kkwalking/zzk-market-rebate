@@ -12,8 +12,8 @@ thread:
         block-queue-size: 5000
         policy: CallerRunsPolicy
 
-# rabbitmq配置
 spring:
+  # rabbitmq配置
   rabbitmq:
     host: 127.0.0.1
     port: 5672
