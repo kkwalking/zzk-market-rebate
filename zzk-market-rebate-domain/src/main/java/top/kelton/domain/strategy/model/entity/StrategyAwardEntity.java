@@ -1,4 +1,4 @@
-package top.kelton.infrastructure.persistent.po;
+package top.kelton.domain.strategy.model.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -6,13 +6,17 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.util.Date;
 
+/**
+ * @description: 策略奖品实体
+ * @author: zzk
+ * @create: 2024-09-25 21:56
+ **/
 @Data
-@Builder
-@AllArgsConstructor
 @NoArgsConstructor
-public class StrategyAwardPO {
+@AllArgsConstructor
+@Builder
+public class StrategyAwardEntity {
 
     /**
      * 自增ID
@@ -54,12 +58,4 @@ public class StrategyAwardPO {
      * 排序
      */
     private Integer sort;
-    /**
-     * 创建时间
-     */
-    private Date createTime;
-    /**
-     * 修改时间
-     */
-    private Date updateTime;
 }

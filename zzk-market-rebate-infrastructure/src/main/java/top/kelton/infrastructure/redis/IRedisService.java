@@ -33,6 +33,8 @@ public interface IRedisService {
      */
     <T> T getValue(String key);
 
+    <K, V> RMap<K, V> getMap(String key);
+
     /**
      * 获取队列
      *

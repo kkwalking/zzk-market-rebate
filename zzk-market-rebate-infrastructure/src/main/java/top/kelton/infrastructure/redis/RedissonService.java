@@ -31,6 +31,12 @@ public class RedissonService implements IRedisService {
     }
 
     @Override
+    public <K, V> RMap<K, V> getMap(String key) {
+        return redissonClient.getMap(key);
+    }
+
+
+    @Override
     public <T> RQueue<T> getQueue(String key) {
         return redissonClient.getQueue(key);
     }
