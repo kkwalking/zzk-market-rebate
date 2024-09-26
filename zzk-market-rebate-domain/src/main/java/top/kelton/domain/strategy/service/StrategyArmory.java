@@ -31,6 +31,7 @@ public class StrategyArmory implements IStrategyArmory{
         // 2.1 获取最小概率的小数点位数
         int minScale = rateMap.values().stream()
                 .min(BigDecimal::compareTo)
+                .map(BigDecimal::stripTrailingZeros)
                 .map(BigDecimal::scale)
                 .orElse(0);
         int factor = (int)Math.pow(10, minScale);
@@ -67,5 +68,20 @@ public class StrategyArmory implements IStrategyArmory{
         int rateRange = repository.getRateRange(strategyId);
         // 通过生成的随机值，获取概率值奖品查找表的结果
         return repository.getStrategyAwardAssemble(strategyId, new SecureRandom().nextInt(rateRange));
+    }
+
+
+    /**
+     *获取target的小数部分位数(仅计算有数值部分，后缀0不计入)
+     * @param target
+     * @return
+     */
+    private int getScale(BigDecimal target) {
+        // 使用 stripTrailingZeros 去除末尾的零
+        BigDecimal stripped = target.stripTrailingZeros();
+        // 获取小数部分位数
+        int scale = stripped.scale();
+        // 如果 scale 为负数，表示这个 BigDecimal 是一个整数
+        return Math.max(scale, 0);
     }
 }
