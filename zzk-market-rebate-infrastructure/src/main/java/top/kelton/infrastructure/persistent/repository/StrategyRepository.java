@@ -2,9 +2,15 @@ package top.kelton.infrastructure.persistent.repository;
 
 import org.springframework.stereotype.Service;
 import top.kelton.domain.strategy.model.entity.StrategyAwardEntity;
+import top.kelton.domain.strategy.model.entity.StrategyEntity;
+import top.kelton.domain.strategy.model.entity.StrategyRuleEntity;
 import top.kelton.domain.strategy.repository.IStrategyRepository;
 import top.kelton.infrastructure.persistent.dao.IStrategyAwardDao;
+import top.kelton.infrastructure.persistent.dao.IStrategyDao;
+import top.kelton.infrastructure.persistent.dao.IStrategyRuleDao;
 import top.kelton.infrastructure.persistent.po.StrategyAwardPO;
+import top.kelton.infrastructure.persistent.po.StrategyPO;
+import top.kelton.infrastructure.persistent.po.StrategyRulePO;
 import top.kelton.infrastructure.redis.IRedisService;
 import top.kelton.types.common.Constants;
 
@@ -23,7 +29,12 @@ public class StrategyRepository implements IStrategyRepository {
     @Resource
     private IStrategyAwardDao strategyAwardDao;
     @Resource
+    private IStrategyDao strategyDao;
+    @Resource
+    private IStrategyRuleDao strategyRuleDao;
+    @Resource
     private IRedisService redisService;
+
     @Override
     public List<StrategyAwardEntity> queryStrategyAwardList(Long strategyId) {
         // 优先从缓存获取
@@ -48,7 +59,7 @@ public class StrategyRepository implements IStrategyRepository {
     }
 
     @Override
-    public void storeStrategyAwardSearchRateTable(Long strategyId, int rateRange, Map<Integer, Long> strategyAwardSearchRateTable) {
+    public void storeStrategyAwardSearchRateTable(String strategyId, int rateRange, Map<Integer, Long> strategyAwardSearchRateTable) {
         // 1. 存储抽奖策略范围
         redisService.setValue(Constants.RedisKey.STRATEGY_RATE_RANGE_KEY + strategyId, rateRange);
         // 2. 存储概率查找表
@@ -57,13 +68,44 @@ public class StrategyRepository implements IStrategyRepository {
     }
 
     @Override
-    public int getRateRange(Long strategyId) {
+    public int getRateRange(String strategyId) {
         return redisService.getValue(Constants.RedisKey.STRATEGY_RATE_RANGE_KEY + strategyId);
     }
 
     @Override
-    public Long getStrategyAwardAssemble(Long strategyId, int rateIndex) {
-        Map<Integer, Long> cacheRateTable = redisService.getMap(Constants.RedisKey.STRATEGY_RATE_TABLE_KEY + strategyId);
+    public Long getStrategyAwardAssemble(String key, int rateIndex) {
+        Map<Integer, Long> cacheRateTable = redisService.getMap(Constants.RedisKey.STRATEGY_RATE_TABLE_KEY + key);
         return cacheRateTable.get(rateIndex);
+    }
+
+    @Override
+    public StrategyEntity queryStrategyEntityByStrategyId(Long strategyId) {
+        // 优先从缓存获取
+        String cacheKey = Constants.RedisKey.STRATEGY_KEY + strategyId;
+        StrategyEntity strategyEntity = redisService.getValue(cacheKey);
+        if (null != strategyEntity) return strategyEntity;
+        StrategyPO strategyPO = strategyDao.findByStrategyId(strategyId);
+        strategyEntity = new StrategyEntity();
+        strategyEntity.setStrategyId(strategyPO.getStrategyId());
+        strategyEntity.setStrategyDesc(strategyPO.getStrategyDesc());
+        strategyEntity.setRuleModels(strategyPO.getRuleModels());
+        redisService.setValue(cacheKey, strategyEntity);
+        return strategyEntity;
+    }
+
+    @Override
+    public StrategyRuleEntity queryStrategyRule(Long strategyId, String ruleWeight) {
+        StrategyRulePO query = new StrategyRulePO();
+        query.setStrategyId(strategyId);
+        query.setRuleModel(ruleWeight);
+        StrategyRulePO strategyRulePO =  strategyRuleDao.queryStrategyRule(query);
+        StrategyRuleEntity strategyRuleEntity = new StrategyRuleEntity();
+        strategyRuleEntity.setStrategyId(strategyRulePO.getStrategyId());
+        strategyRuleEntity.setAwardId(strategyRulePO.getAwardId());
+        strategyRuleEntity.setRuleType(strategyRulePO.getRuleType());
+        strategyRuleEntity.setRuleModel(strategyRulePO.getRuleModel());
+        strategyRuleEntity.setRuleValue(strategyRulePO.getRuleValue());
+        strategyRuleEntity.setRuleDesc(strategyRulePO.getRuleDesc());
+        return strategyRuleEntity;
     }
 }

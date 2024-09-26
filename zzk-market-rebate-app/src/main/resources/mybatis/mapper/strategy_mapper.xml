@@ -6,14 +6,24 @@
         <id column="id" property="id"/>
         <result column="strategy_id" property="strategyId"/>
         <result column="strategy_desc" property="strategyDesc"/>
+        <result column="rule_models" property="ruleModels"/>
         <result column="create_time" property="createTime"/>
         <result column="update_time" property="updateTime"/>
     </resultMap>
 
+    <sql id="Base_Column_List">
+        strategy_id, strategy_desc, rule_models, create_time, update_time
+    </sql>
+
     <select id="queryStrategyList" resultMap="dataMap">
-        select strategy_id
+        select  <include refid="Base_Column_List"></include>
         from strategy
-                 limit 10
+        limit 10
+    </select>
+    <select id="findByStrategyId" resultType="top.kelton.infrastructure.persistent.po.StrategyPO">
+        select <include refid="Base_Column_List"></include>
+        from strategy
+        where strategy_id=#{strategyId}
     </select>
 
 </mapper>

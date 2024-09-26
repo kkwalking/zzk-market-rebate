@@ -2,6 +2,8 @@ package top.kelton.domain.strategy.repository;
 
 
 import top.kelton.domain.strategy.model.entity.StrategyAwardEntity;
+import top.kelton.domain.strategy.model.entity.StrategyEntity;
+import top.kelton.domain.strategy.model.entity.StrategyRuleEntity;
 
 import java.util.List;
 import java.util.Map;
@@ -12,20 +14,24 @@ import java.util.Map;
 public interface IStrategyRepository {
     List<StrategyAwardEntity>  queryStrategyAwardList(Long strategyId);
 
-    void storeStrategyAwardSearchRateTable(Long strategyId, int rateRange, Map<Integer, Long> strategyAwardSearchRateTable);
+    void storeStrategyAwardSearchRateTable(String strategyId, int rateRange, Map<Integer, Long> strategyAwardSearchRateTable);
 
     /**
      * 获取策略对应的概率范围
      * @param strategyId
      * @return
      */
-    int getRateRange(Long strategyId);
+    int getRateRange(String strategyId);
 
     /**
      * 获取该策略对应index的奖品id
-     * @param strategyId
+     * @param key
      * @param rateIndex
      * @return
      */
-    Long getStrategyAwardAssemble(Long strategyId, int rateIndex);
+    Long getStrategyAwardAssemble(String key,  int rateIndex);
+
+    StrategyEntity queryStrategyEntityByStrategyId(Long strategyId);
+
+    StrategyRuleEntity queryStrategyRule(Long strategyId, String ruleWeight);
 }
