@@ -108,4 +108,14 @@ public class StrategyRepository implements IStrategyRepository {
         strategyRuleEntity.setRuleDesc(strategyRulePO.getRuleDesc());
         return strategyRuleEntity;
     }
+
+    @Override
+    public String queryStrategyRuleValue(Long strategyId, Integer awardId, String ruleModel) {
+
+        StrategyRulePO strategyRule = new StrategyRulePO();
+        strategyRule.setStrategyId(strategyId);
+        strategyRule.setAwardId(awardId);
+        strategyRule.setRuleModel(ruleModel);
+        return strategyRuleDao.queryStrategyRuleValue(strategyRule);
+    }
 }

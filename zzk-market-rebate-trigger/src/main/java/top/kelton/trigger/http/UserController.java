@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 import top.kelton.api.dto.SaveUserRequestDTO;
 import top.kelton.domain.user.service.UserService;
 import top.kelton.types.common.Constants;
+import top.kelton.types.enums.ResponseCode;
 import top.kelton.types.model.Response;
 
 import javax.annotation.Resource;
@@ -29,16 +30,16 @@ public class UserController {
         try {
             userService.saveUser(requestDTO.getName(), requestDTO.getAge());
             Response<String> response = Response.<String>builder()
-                    .code(Constants.ResponseCode.SUCCESS.getCode())
-                    .info(Constants.ResponseCode.SUCCESS.getInfo())
+                    .code(ResponseCode.SUCCESS.getCode())
+                    .info(ResponseCode.SUCCESS.getInfo())
                     .data("success")
                     .build();
             log.info("保存用户成功:{}", JSON.toJSONString(response));
             return response;
         } catch (Exception e) {
             Response<String> response = Response.<String>builder()
-                    .code(Constants.ResponseCode.UN_ERROR.getCode())
-                    .info(Constants.ResponseCode.UN_ERROR.getInfo())
+                    .code(ResponseCode.UN_ERROR.getCode())
+                    .info(ResponseCode.UN_ERROR.getInfo())
                     .data("fail")
                     .build();
             log.info("保存用户失败:{}", JSON.toJSONString(response));
