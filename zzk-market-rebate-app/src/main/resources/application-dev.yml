@@ -29,9 +29,9 @@ spring:
 #      credit_adjust_success: credit_adjust_success
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://127.0.0.1:3306/zzk-market-rebate?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://127.0.0.1:13306/zzk-market-rebate?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
     username: root
-    password: 0754zzk
+    password: 123456
     hikari:
       maximum-pool-size: 10
       minimum-idle: 2
@@ -48,8 +48,8 @@ redis:
   sdk:
     config:
       host: 127.0.0.1
-      port: 6379
-      password: 0754zzk
+      port: 16379
+      password:
       pool-size: 10
       min-idle-size: 5
       idle-timeout: 30000

@@ -4,6 +4,7 @@ package top.kelton.domain.strategy.repository;
 import top.kelton.domain.strategy.model.entity.StrategyAwardEntity;
 import top.kelton.domain.strategy.model.entity.StrategyEntity;
 import top.kelton.domain.strategy.model.entity.StrategyRuleEntity;
+import top.kelton.domain.strategy.model.valobj.StrategyAwardRuleModelVO;
 
 import java.util.List;
 import java.util.Map;
@@ -35,6 +36,7 @@ public interface IStrategyRepository {
 
     StrategyRuleEntity queryStrategyRule(Long strategyId, String ruleWeight);
 
-    String queryStrategyRuleValue(Long strategyId, Integer awardId, String ruleModel);
+    String queryStrategyRuleValue(Long strategyId, Long awardId, String ruleModel);
 
+    StrategyAwardRuleModelVO queryStrategyAwardRuleModelVO(Long strategyId, Long awardId);
 }

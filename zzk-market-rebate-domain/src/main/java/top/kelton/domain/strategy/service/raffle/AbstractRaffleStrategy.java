@@ -1,11 +1,13 @@
 package top.kelton.domain.strategy.service.raffle;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import top.kelton.domain.strategy.model.entity.RaffleAwardEntity;
 import top.kelton.domain.strategy.model.entity.RaffleFactorEntity;
 import top.kelton.domain.strategy.model.entity.RuleActionEntity;
 import top.kelton.domain.strategy.model.entity.StrategyEntity;
 import top.kelton.domain.strategy.model.valobj.RuleLogicCheckTypeVO;
+import top.kelton.domain.strategy.model.valobj.StrategyAwardRuleModelVO;
 import top.kelton.domain.strategy.repository.IStrategyRepository;
 import top.kelton.domain.strategy.service.armory.IStrategyDispatch;
 import top.kelton.domain.strategy.service.rule.factory.DefaultLogicFactory;
@@ -17,6 +19,7 @@ import top.kelton.types.exception.AppException;
  * @description 抽奖策略抽象类-定义标准抽奖流程-应用<模板方法>设计模式
  * @created 2024/9/27
  */
+@Slf4j
 public abstract class AbstractRaffleStrategy implements IRaffleStrategy {
 
     // 策略仓储服务
@@ -64,15 +67,30 @@ public abstract class AbstractRaffleStrategy implements IRaffleStrategy {
         }
 
         // 3. 规则过滤完，执行普通随机抽奖
-        Long randomAwardId = strategyDispatch.getRandomAwardId(strategyId);
+        Long awardId = strategyDispatch.getRandomAwardId(strategyId);
 
-        // 目前只返回奖品id
+        // 4. 查询奖品抽奖中、后规则  [抽奖中（拿到奖品ID时，过滤规则）、抽奖后（扣减完奖品库存后过滤，抽奖中拦截和无库存则走兜底）]
+        StrategyAwardRuleModelVO strategyAwardRuleModelVO = repository.queryStrategyAwardRuleModelVO(strategyId, awardId);
+
+        // 4.1 抽奖中置规则过滤
+        RuleActionEntity<RuleActionEntity.RaffleCenterEntity> ruleActionCenterEntity = this.doCheckRaffleCenterLogic(RaffleFactorEntity.builder()
+                .userId(userId)
+                .strategyId(strategyId)
+                .awardId(awardId)
+                .build(), strategyAwardRuleModelVO.raffleCenterRuleModelList());
+        if (RuleLogicCheckTypeVO.TAKE_OVER.getCode().equals(ruleActionCenterEntity.getCode())){
+            log.info("【临时日志】中奖中规则拦截，通过抽奖后规则 rule_luck_award 走兜底奖励。");
+            return RaffleAwardEntity.builder()
+                    .awardDesc("中奖中规则拦截，通过抽奖后规则 rule_luck_award 走兜底奖励。")
+                    .build();
+        }
+        // 4.2 后续会有后置规则
         return RaffleAwardEntity.builder()
-                .strategyId(raffleFactorEntity.getStrategyId())
-                .awardId(randomAwardId)
+                .awardId(awardId)
                 .build();
     }
 
     protected abstract RuleActionEntity<RuleActionEntity.RaffleBeforeEntity> doCheckRaffleBeforeLogic(RaffleFactorEntity raffleFactorEntity, String... logics);
+    protected abstract RuleActionEntity<RuleActionEntity.RaffleCenterEntity> doCheckRaffleCenterLogic(RaffleFactorEntity raffleFactorEntity, String... logics);
 
 }

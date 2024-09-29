@@ -10,7 +10,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 import top.kelton.domain.strategy.model.entity.RaffleAwardEntity;
 import top.kelton.domain.strategy.model.entity.RaffleFactorEntity;
+import top.kelton.domain.strategy.service.armory.IStrategyArmory;
 import top.kelton.domain.strategy.service.raffle.IRaffleStrategy;
+import top.kelton.domain.strategy.service.rule.filter.RuleLockLogicFilter;
 import top.kelton.domain.strategy.service.rule.filter.RuleWeightLogicFilter;
 
 import javax.annotation.Resource;
@@ -26,13 +28,21 @@ import javax.annotation.Resource;
 public class RaffleStrategyTest {
 
     @Resource
+    private IStrategyArmory strategyArmory;
+    @Resource
     private IRaffleStrategy raffleStrategy;
     @Resource
     private RuleWeightLogicFilter ruleWeightLogicFilter;
+    @Resource
+    private RuleLockLogicFilter ruleLockLogicFilter;
 
     @Before
     public void setUp() {
-        ReflectionTestUtils.setField(ruleWeightLogicFilter, "userScore", 40500L);
+
+        log.info("测试结果：{}", strategyArmory.assembleLotteryStrategy(100001L));
+        ReflectionTestUtils.setField(ruleWeightLogicFilter, "userScore", 100L);
+
+        ReflectionTestUtils.setField(ruleLockLogicFilter, "userRaffleCount", 10L);
     }
 
     @Test
@@ -52,6 +62,19 @@ public class RaffleStrategyTest {
     public void test_raffle_blacklist() {
         RaffleFactorEntity raffleFactorEntity = RaffleFactorEntity.builder()
                 .userId("user003")  // 黑名单用户 user001,user002,user003
+                .strategyId(100001L)
+                .build();
+
+        RaffleAwardEntity raffleAwardEntity = raffleStrategy.raffle(raffleFactorEntity);
+
+        log.info("请求参数：{}", JSON.toJSONString(raffleFactorEntity));
+        log.info("测试结果：{}", JSON.toJSONString(raffleAwardEntity));
+    }
+
+    @Test
+    public void test_raffle_center_rule_lock(){
+        RaffleFactorEntity raffleFactorEntity = RaffleFactorEntity.builder()
+                .userId("zzk")
                 .strategyId(100001L)
                 .build();
 

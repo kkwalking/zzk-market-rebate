@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import top.kelton.domain.strategy.model.entity.StrategyAwardEntity;
 import top.kelton.domain.strategy.model.entity.StrategyEntity;
 import top.kelton.domain.strategy.model.entity.StrategyRuleEntity;
+import top.kelton.domain.strategy.model.valobj.StrategyAwardRuleModelVO;
 import top.kelton.domain.strategy.repository.IStrategyRepository;
 import top.kelton.infrastructure.persistent.dao.IStrategyAwardDao;
 import top.kelton.infrastructure.persistent.dao.IStrategyDao;
@@ -110,12 +111,21 @@ public class StrategyRepository implements IStrategyRepository {
     }
 
     @Override
-    public String queryStrategyRuleValue(Long strategyId, Integer awardId, String ruleModel) {
+    public String queryStrategyRuleValue(Long strategyId, Long awardId, String ruleModel) {
 
         StrategyRulePO strategyRule = new StrategyRulePO();
         strategyRule.setStrategyId(strategyId);
         strategyRule.setAwardId(awardId);
         strategyRule.setRuleModel(ruleModel);
         return strategyRuleDao.queryStrategyRuleValue(strategyRule);
+    }
+
+    @Override
+    public StrategyAwardRuleModelVO queryStrategyAwardRuleModelVO(Long strategyId, Long awardId) {
+        StrategyAwardPO strategyAward = new StrategyAwardPO();
+        strategyAward.setStrategyId(strategyId);
+        strategyAward.setAwardId(awardId);
+        String ruleModels = strategyAwardDao.queryStrategyAwardRuleModels(strategyAward);
+        return StrategyAwardRuleModelVO.builder().ruleModels(ruleModels).build();
     }
 }
