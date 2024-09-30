@@ -20,7 +20,7 @@ import javax.annotation.Resource;
 @Slf4j
 @Component
 @LogicStrategy(logicMode = DefaultLogicFactory.LogicModel.RULE_LOCK)
-public class RuleLockLogicFilter implements ILogicFilter<RuleActionEntity.RaffleCenterEntity>{
+public class RuleLockLogicFilter implements ILogicFilter<RuleActionEntity.RaffleCenterEntity> {
 
     @Resource
     private IStrategyRepository repository;
@@ -30,12 +30,12 @@ public class RuleLockLogicFilter implements ILogicFilter<RuleActionEntity.Raffle
 
     @Override
     public RuleActionEntity<RuleActionEntity.RaffleCenterEntity> filter(RuleMatterEntity ruleMatterEntity) {
-     String userId = ruleMatterEntity.getUserId();
-     Long strategyId = ruleMatterEntity.getStrategyId();
-     Long awardId = ruleMatterEntity.getAwardId();
-     String ruleModel = ruleMatterEntity.getRuleModel();
+        String userId = ruleMatterEntity.getUserId();
+        Long strategyId = ruleMatterEntity.getStrategyId();
+        Long awardId = ruleMatterEntity.getAwardId();
+        String ruleModel = ruleMatterEntity.getRuleModel();
 
-        log.info("规则过滤-次数锁 userId:{} strategyId:{} awardId:{} ruleModel:{}",userId,
+        log.info("规则过滤-次数锁 userId:{} strategyId:{} awardId:{} ruleModel:{}", userId,
                 strategyId, awardId, ruleModel);
         // 获取奖品配置的规则值
         String strategyRuleValue = repository.queryStrategyRuleValue(strategyId, awardId, ruleModel);
@@ -46,12 +46,14 @@ public class RuleLockLogicFilter implements ILogicFilter<RuleActionEntity.Raffle
             return RuleActionEntity.<RuleActionEntity.RaffleCenterEntity>builder()
                     .code(RuleLogicCheckTypeVO.TAKE_OVER.getCode())
                     .info(RuleLogicCheckTypeVO.TAKE_OVER.getInfo())
+                    .ruleModel(DefaultLogicFactory.LogicModel.RULE_LOCK.getCode())
                     .build();
         }
         // 用户抽奖次数小于解锁次数 拦截
         return RuleActionEntity.<RuleActionEntity.RaffleCenterEntity>builder()
                 .code(RuleLogicCheckTypeVO.ALLOW.getCode())
                 .info(RuleLogicCheckTypeVO.ALLOW.getInfo())
+                .ruleModel(DefaultLogicFactory.LogicModel.RULE_LOCK.getCode())
                 .build();
     }
 }

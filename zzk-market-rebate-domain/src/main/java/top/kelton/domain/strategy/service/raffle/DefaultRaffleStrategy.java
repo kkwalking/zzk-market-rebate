@@ -98,15 +98,19 @@ public class DefaultRaffleStrategy extends AbstractRaffleStrategy {
         RuleActionEntity<RuleActionEntity.RaffleCenterEntity> ruleActionEntity = null;
         for (String ruleModel : logics) {
             ILogicFilter<RuleActionEntity.RaffleCenterEntity> logicFilter = logicFilterGroup.get(ruleModel);
-            RuleMatterEntity ruleMatterEntity = new RuleMatterEntity();
-            ruleMatterEntity.setUserId(raffleFactorEntity.getUserId());
-            ruleMatterEntity.setAwardId(raffleFactorEntity.getAwardId());
-            ruleMatterEntity.setStrategyId(raffleFactorEntity.getStrategyId());
-            ruleMatterEntity.setRuleModel(ruleModel);
-            ruleActionEntity = logicFilter.filter(ruleMatterEntity);
-            // 非放行结果则顺序过滤
-            log.info("抽奖中置规则过滤 userId: {} ruleModel: {} code: {} info: {}", raffleFactorEntity.getUserId(), ruleModel, ruleActionEntity.getCode(), ruleActionEntity.getInfo());
-            if (!RuleLogicCheckTypeVO.ALLOW.getCode().equals(ruleActionEntity.getCode())) return ruleActionEntity;
+            // 暂时忽略没有提供的过滤器
+            if (logicFilter!= null) {
+                RuleMatterEntity ruleMatterEntity = new RuleMatterEntity();
+                ruleMatterEntity.setUserId(raffleFactorEntity.getUserId());
+                ruleMatterEntity.setAwardId(raffleFactorEntity.getAwardId());
+                ruleMatterEntity.setStrategyId(raffleFactorEntity.getStrategyId());
+                ruleMatterEntity.setRuleModel(ruleModel);
+                ruleActionEntity = logicFilter.filter(ruleMatterEntity);
+                // 非放行结果则顺序过滤
+                log.info("抽奖中置规则过滤 userId: {} ruleModel: {} code: {} info: {}", raffleFactorEntity.getUserId(), ruleModel, ruleActionEntity.getCode(), ruleActionEntity.getInfo());
+                if (!RuleLogicCheckTypeVO.ALLOW.getCode().equals(ruleActionEntity.getCode())) return ruleActionEntity;
+            }
+
         }
         return ruleActionEntity;
     }

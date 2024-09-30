@@ -36,10 +36,12 @@ public class RaffleStrategyTest {
     @Resource
     private RuleLockLogicFilter ruleLockLogicFilter;
 
+    private Long strategyId = 100003L;
+
     @Before
     public void setUp() {
-
-        log.info("测试结果：{}", strategyArmory.assembleLotteryStrategy(100001L));
+        strategyId = 100001L;
+        log.info("测试结果：{}", strategyArmory.assembleLotteryStrategy(strategyId));
         ReflectionTestUtils.setField(ruleWeightLogicFilter, "userScore", 100L);
 
         ReflectionTestUtils.setField(ruleLockLogicFilter, "userRaffleCount", 10L);
@@ -75,13 +77,15 @@ public class RaffleStrategyTest {
     public void test_raffle_center_rule_lock(){
         RaffleFactorEntity raffleFactorEntity = RaffleFactorEntity.builder()
                 .userId("zzk")
-                .strategyId(100001L)
+                .strategyId(strategyId)
                 .build();
 
-        RaffleAwardEntity raffleAwardEntity = raffleStrategy.raffle(raffleFactorEntity);
+        for(int i = 0; i< 2; i++) {
+            RaffleAwardEntity raffleAwardEntity = raffleStrategy.raffle(raffleFactorEntity);
 
-        log.info("请求参数：{}", JSON.toJSONString(raffleFactorEntity));
-        log.info("测试结果：{}", JSON.toJSONString(raffleAwardEntity));
+            log.info("请求参数：{}", JSON.toJSONString(raffleFactorEntity));
+            log.info("测试结果：{}", JSON.toJSONString(raffleAwardEntity));
+        }
     }
 
 }

@@ -1,5 +1,6 @@
 package top.kelton.domain.strategy.service.raffle;
 
+import com.alibaba.fastjson2.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import top.kelton.domain.strategy.model.entity.RaffleAwardEntity;
@@ -47,8 +48,10 @@ public abstract class AbstractRaffleStrategy implements IRaffleStrategy {
         // 策略查询
         StrategyEntity strategy = repository.queryStrategyEntityByStrategyId(strategyId);
 
-        RuleActionEntity<RuleActionEntity.RaffleBeforeEntity> ruleActionEntity = this.doCheckRaffleBeforeLogic(RaffleFactorEntity.builder().userId(userId).strategyId(strategyId).build(), strategy.ruleModels());
-
+        // 顺序过滤，被其中一个接管则跳出过滤链进行返回，也可能没有规则接管
+        RuleActionEntity<RuleActionEntity.RaffleBeforeEntity> ruleActionEntity = this.doCheckRaffleBeforeLogic(
+                RaffleFactorEntity.builder().userId(userId).strategyId(strategyId).build(), strategy.ruleModels());
+        // 抽象出方法，统一处理接管结果的转换
         if (RuleLogicCheckTypeVO.TAKE_OVER.getCode().equals(ruleActionEntity.getCode())) {
             if (DefaultLogicFactory.LogicModel.RULE_BLACKLIST.getCode().equals(ruleActionEntity.getRuleModel())) {
                 // 黑名单返回固定的奖品ID
@@ -65,23 +68,28 @@ public abstract class AbstractRaffleStrategy implements IRaffleStrategy {
                         .build();
             }
         }
+        log.info("未被前置规则接管，继续执行 strategyId:{}, userId:{}", strategyId, userId);
 
         // 3. 规则过滤完，执行普通随机抽奖
         Long awardId = strategyDispatch.getRandomAwardId(strategyId);
+        log.info("随机抽奖结果 strategyId:{} userId:{} awardId:{}", strategyId, userId, awardId);
 
         // 4. 查询奖品抽奖中、后规则  [抽奖中（拿到奖品ID时，过滤规则）、抽奖后（扣减完奖品库存后过滤，抽奖中拦截和无库存则走兜底）]
         StrategyAwardRuleModelVO strategyAwardRuleModelVO = repository.queryStrategyAwardRuleModelVO(strategyId, awardId);
-
+        String[] centerRuleModelList = strategyAwardRuleModelVO.raffleCenterRuleModelList();
+        log.info("执行抽奖中置规则 strategyId:{} userId:{} awardId:{} centerRuleModelList:{}",
+                strategyId, userId, awardId, JSON.toJSONString(centerRuleModelList));
         // 4.1 抽奖中置规则过滤
         RuleActionEntity<RuleActionEntity.RaffleCenterEntity> ruleActionCenterEntity = this.doCheckRaffleCenterLogic(RaffleFactorEntity.builder()
                 .userId(userId)
                 .strategyId(strategyId)
                 .awardId(awardId)
-                .build(), strategyAwardRuleModelVO.raffleCenterRuleModelList());
-        if (RuleLogicCheckTypeVO.TAKE_OVER.getCode().equals(ruleActionCenterEntity.getCode())){
-            log.info("【临时日志】中奖中规则拦截，通过抽奖后规则 rule_luck_award 走兜底奖励。");
+                .build(), centerRuleModelList);
+        if (RuleLogicCheckTypeVO.TAKE_OVER.getCode().equals(ruleActionCenterEntity.getCode())) {
+            log.info("抽奖中置规则拦截，strategyId:{} userId:{} awardId:{} ruleModel:{}",
+                    strategyId, userId, awardId, ruleActionCenterEntity.getRuleModel());
             return RaffleAwardEntity.builder()
-                    .awardDesc("中奖中规则拦截，通过抽奖后规则 rule_luck_award 走兜底奖励。")
+                    .awardDesc("抽奖中置规则拦截，后续通过抽奖后置规则 rule_luck_award 走兜底奖励。")
                     .build();
         }
         // 4.2 后续会有后置规则
@@ -91,6 +99,7 @@ public abstract class AbstractRaffleStrategy implements IRaffleStrategy {
     }
 
     protected abstract RuleActionEntity<RuleActionEntity.RaffleBeforeEntity> doCheckRaffleBeforeLogic(RaffleFactorEntity raffleFactorEntity, String... logics);
+
     protected abstract RuleActionEntity<RuleActionEntity.RaffleCenterEntity> doCheckRaffleCenterLogic(RaffleFactorEntity raffleFactorEntity, String... logics);
 
 }
